@@ -2,13 +2,18 @@ package com.qa.opencart.pages;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.Nullable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import com.qa.opencart.constants.AppConstants;
+import com.qa.opencart.factory.DriverFactory;
 import com.qa.opencart.utils.ElementUtil;
+
+import io.qameta.allure.Step;
 
 public class LoginPage {
 	private WebDriver driver;
@@ -25,7 +30,7 @@ public class LoginPage {
 	private final By sideLinks = By.xpath("//div[@class='list-group']/a");
     private final By registerLink = By.linkText("Register");
 	// public constructor
-
+    private static final Logger log = LogManager.getLogger(LoginPage.class);
 	public LoginPage(WebDriver driver)
 
 	{
@@ -33,27 +38,26 @@ public class LoginPage {
 		eleutil = new ElementUtil(driver);
 	}
 
-	// page methods
-
+@Step("getting login page title.....")
 	public String getLoginPageTitle() {
 		String title = driver.getTitle();
 		System.out.println("Login page title is:" + title);
 		return title;
 	}
-
+@Step("getting login page URL.....")
 	public String getLoginPageURL() {
 		String url = driver.getCurrentUrl();
 		System.out.println("Login Page URL is :" + url);
 		return url;
 	}
-
+@Step("getting login page Header.....")
 	public String getLoginPageHeader() {
 		String text = driver.findElement(header).getText();
 		System.out.println("Login page header is: " + text);
 		return text;
 
 	}
-
+@Step("login with username:{0} and password {1}.....")
 	public AccountsPage doLogin(String appUserName, String appPassword) {
 		driver.findElement(emailID).sendKeys(appUserName);
 		driver.findElement(password).sendKeys(appPassword);
@@ -61,7 +65,7 @@ public class LoginPage {
 		// return driver.getTitle();
 		return new AccountsPage(driver);
 	}
-
+@Step("login page header links")
 	public void displayHeaderLinks() {
 		List<WebElement> list = driver.findElements(headerList);
 		System.out.println("=========================");
@@ -73,7 +77,7 @@ public class LoginPage {
 		}
 
 	}
-
+@Step("login page display side links")
 	public void displaySideLinks() {
 		List<WebElement> list = driver.findElements(sideLinks);
 		System.out.println("=========================");
@@ -85,6 +89,7 @@ public class LoginPage {
 			System.out.println(sideLinks);
 		}
 	}
+@Step("navigate to register page ")
 		
 		public RegisterPage navigateToRegisterPage()
 		{

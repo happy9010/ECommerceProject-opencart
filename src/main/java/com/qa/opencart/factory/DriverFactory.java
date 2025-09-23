@@ -1,13 +1,19 @@
 package com.qa.opencart.factory;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.safari.SafariDriver;
 
 import com.qa.opencart.errors.AppError;
@@ -18,64 +24,121 @@ public class DriverFactory {
 	public WebDriver driver; // do not make it static it will not support your parallel execution
 	public Properties prop;
 	public static String highlightEle;
-
-	/**
-	 * 
-	 * @param browserName
-	 * @return
-	 */
+   public static ThreadLocal<WebDriver> tlDriver = new ThreadLocal <WebDriver>();
+   private static final Logger log = LogManager.getLogger(DriverFactory.class);
+   public OptionsManager optionsManager;
 	public WebDriver initDriver(Properties prop) {
 		String browserName = prop.getProperty("browser");
-		System.out.println("browser name is:" + browserName);
+	//	System.out.println("browser name is:" + browserName);
+		log.info("browser name :" + browserName );
+		
 		highlightEle = prop.getProperty("highlight");
-
+		optionsManager = new  OptionsManager(prop);
 		switch (browserName.toLowerCase().trim()) {
 		case "chrome":
-			driver = new ChromeDriver();
+		//	driver = new ChromeDriver();
+			tlDriver.set(new ChromeDriver(optionsManager.getChromeOptions()));
 			break;
 		case "safari":
-			driver = new SafariDriver();
+		//	driver = new SafariDriver();
+			tlDriver.set(new SafariDriver());
 			break;
 		case "edge":
-			driver = new EdgeDriver();
+		//	driver = new EdgeDriver();
+			tlDriver.set(new EdgeDriver(optionsManager.getEdgeOptions()));
 			break;
 		case "firefox":
-			driver = new SafariDriver();
+		//	driver = new FirefoxDriver();
+			tlDriver.set(new FirefoxDriver(optionsManager.getFirefoxOptions()));
 			break;
 
 		default:
-			System.out.println(AppError.INVALID_BROWSER_MESG + ":" + browserName);
-
+		//	System.out.println(AppError.INVALID_BROWSER_MESG + ":" + browserName);
+         log.error(AppError.INVALID_BROWSER_MESG + ":" + browserName);
 			throw new FrameworkException("======Invalid Browser=====");
 
 		}
 
-		driver.manage().deleteAllCookies();
-		driver.manage().window().fullscreen();
-		driver.get(prop.getProperty("url"));
-		return driver;
+		getDriver().manage().deleteAllCookies();
+		getDriver().manage().window().fullscreen();
+		getDriver().get(prop.getProperty("url"));
+		return getDriver();
 
 	}
+	public static WebDriver getDriver()
+	{
+		return tlDriver.get();
+	}
 
-	/**
-	 * this method is intializign
-	 * 
-	 * @return
-	 */
+
 	public Properties initProp() {
 		prop = new Properties();
+		FileInputStream ip = null;
+
+		String envName = System.getProperty("env");
+		log.info("Env name =======>" + envName);
+
 		try {
-			FileInputStream ip = new FileInputStream("./resources/coonfig/config.properties");
-			prop.load(ip);
+			if (envName == null) {
+				log.warn("no env.. is passed, hence running tcs on QA environment...by default..");
+				ip = new FileInputStream("./resources/coonfig/config.qa.properties");
+			}
+
+			else {
+				switch (envName.trim().toLowerCase()) {
+				case "qa":
+					ip = new FileInputStream("./resources/coonfig/config.qa.properties");
+					break;
+				case "stage":
+					ip = new FileInputStream("./resources/coonfig/config.stage.properties");
+					break;
+				case "uat":
+					ip = new FileInputStream("./resources/coonfig/config.uat.properties");
+					break;
+				case "dev":
+					ip = new FileInputStream("./resources/coonfig/config.dev.properties");
+					break;
+				case "prod":
+					ip = new FileInputStream("./resources/coonfig/config.properties");
+					break;
+				default:
+					log.error("Env value is invalid...plz pass the right env value..");
+					throw new FrameworkException("====INVALID ENVIRONMENT====");
+				}
+			}
+
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		try {
+			prop.load(ip);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		return prop;
 	}
+	
+	/**
+	 * takescreenshot
+	 */
+
+	public static File getScreenshotFile() {
+		File srcFile = ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.FILE);
+		return srcFile;
+	}
+
+	public static byte[] getScreenshotByte() {
+		return ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.BYTES);
+
+	}
+
+	public static String getScreenshotBase64() {
+		return ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.BASE64);
+
+	}
+
 
 }
 	
