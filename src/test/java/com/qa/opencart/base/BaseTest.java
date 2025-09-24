@@ -24,7 +24,7 @@ import com.qa.opencart.pages.SearchResultsPage;
 import io.qameta.allure.Description;
 
 //@Listeners(ChainTestListener.class)
-//@Listeners({ChainTestListener.class , TestAllureListener.class} )
+@Listeners({ChainTestListener.class , TestAllureListener.class} )
 public class BaseTest { 
 	protected WebDriver driver;
 	protected Properties prop;
