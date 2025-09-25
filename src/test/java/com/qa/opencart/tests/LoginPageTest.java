@@ -30,7 +30,7 @@ public class LoginPageTest extends BaseTest{
 	{
 	String actualTitle = 	loginpage.getLoginPageTitle();
 	ChainTestListener.log("login page tite: "+ actualTitle);
-	Assert.assertEquals(actualTitle, "Account Login11");
+	Assert.assertEquals(actualTitle, "Account Login");
 		
 	}
 	@Description("login page url test....")
