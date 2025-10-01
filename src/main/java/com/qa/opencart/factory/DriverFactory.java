@@ -81,25 +81,25 @@ public class DriverFactory {
 		try {
 			if (envName == null) {
 				log.warn("no env.. is passed, hence running tcs on QA environment...by default..");
-				ip = new FileInputStream("./resources/coonfig/config.qa.properties");
+				ip = new FileInputStream("./src/test/resources/coonfig/config.qa.properties");
 			}
 
 			else {
 				switch (envName.trim().toLowerCase()) {
 				case "qa":
-					ip = new FileInputStream("./resources/coonfig/config.qa.properties");
+					ip = new FileInputStream("./src/test/resources/coonfig/config.qa.properties");
 					break;
 				case "stage":
-					ip = new FileInputStream("./resources/coonfig/config.stage.properties");
+					ip = new FileInputStream("./src/test/resources/coonfig/config.stage.properties");
 					break;
 				case "uat":
-					ip = new FileInputStream("./resources/coonfig/config.uat.properties");
+					ip = new FileInputStream("./src/test/resources/coonfig/config.uat.properties");
 					break;
 				case "dev":
-					ip = new FileInputStream("./resources/coonfig/config.dev.properties");
+					ip = new FileInputStream("./src/test/resources/coonfig/config.dev.properties");
 					break;
 				case "prod":
-					ip = new FileInputStream("./resources/coonfig/config.properties");
+					ip = new FileInputStream("./src/test/resources/coonfig/config.properties");
 					break;
 				default:
 					log.error("Env value is invalid...plz pass the right env value..");
