@@ -15,7 +15,7 @@ public class AccountsPage {
 	private WebDriver driver;
 	private ElementUtil eleUtil;
 	
-	By mainSideHeaders= By.xpath("//div[@id='content']//h2");
+	By mainSideHeaders= By.xpath("//div[@id='content']//h2"); //  
 	By rightSideLinks = By.xpath("(//div[@class='list-group'])/a");
 	
 	By searchField= By.name("search");
